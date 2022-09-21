@@ -2,13 +2,21 @@ const express = require("express");
 const app = express()
 const http = require("http")
 const server = http.createServer(app)
-// const io = require("socket.io")(server, {cors: {origin: "*"}})
-
+// try to change next 2 lines
+const { Server } = require("socket.io");
+const io = new Server(server);
 
 app.listen(3001, ()=>{console.log("running")})
 
 app.get('/', (req, res) => {
-    res.send('<h1>Hello world</h1>');
+    res.sendFile(__dirname + '/index.html');
+});
+    
+io.on('connection', (socket) => {
+    socket.on('chat message', (msg) => {
+      io.emit('chat message', msg);
+      console.log('message: ' + msg + " sent by " + socket.id);
+    });
 });
   
 server.listen(3000, () => {
